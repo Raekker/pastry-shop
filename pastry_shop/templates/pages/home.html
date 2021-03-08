@@ -1,1 +1,20 @@
 {% extends "base.html" %}
+
+{% block content %}
+<section id="id_recent_posts">
+  {% if recent_posts %}
+    {% for recent_post in recent_posts %}
+    <div>
+      <h3>{{ recent_post.title }}</h3>
+      <p>{{ recent_post.content|truncatewords:10 }}</p>
+    </div>
+    {% endfor %}
+  {% endif %}
+</section>
+<section id="about">
+<div>
+  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet dolor, esse facere illo in molestiae,
+    nisi nobis optio repudiandae ut vel voluptatem! Doloremque illum ipsa ipsam molestiae non sint, vel.</p>
+</div>
+</section>
+{% endblock content %}
