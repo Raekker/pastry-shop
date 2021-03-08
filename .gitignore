@@ -331,3 +331,4 @@ pastry_shop/media/
 !.envs/.local/
 
 .idea/
+.envs/.local
