@@ -5,8 +5,10 @@ from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 
+from pastry_shop.blog.views import MainPageView
+
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    path("", MainPageView.as_view(), name="home"),
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
@@ -16,6 +18,7 @@ urlpatterns = [
     path("users/", include("pastry_shop.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
+    path("blog/", include("pastry_shop.blog.urls", namespace="blog")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

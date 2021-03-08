@@ -8,6 +8,13 @@
       <h3>{{ recent_post.title }}</h3>
       <p>{{ recent_post.content|truncatewords:10 }}</p>
     </div>
+    <div>
+    {% if recent_post.comments.all %}
+      <p>Comments: {{ recent_post.comments.count }}</p>
+    {% else %}
+      <p>No comments yet</p>
+    {% endif %}
+    </div>
     {% endfor %}
   {% endif %}
 </section>
