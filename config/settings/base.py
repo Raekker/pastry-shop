@@ -69,12 +69,14 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "autoslug",
 ]
 
 LOCAL_APPS = [
     "pastry_shop.users.apps.UsersConfig",
     # Your stuff: custom apps go here
     "pastry_shop.blog.apps.BlogConfig",
+    "pastry_shop.shop.apps.ShopConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
