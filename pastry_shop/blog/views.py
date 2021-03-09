@@ -3,6 +3,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.views.generic.base import View
+from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from pastry_shop.blog.models import Post
@@ -22,3 +23,8 @@ class PostListView(ListView):
 
     def get_queryset(self) -> QuerySet:
         return Post.objects.order_by("-created")
+
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = "blog/post_detail.html"
