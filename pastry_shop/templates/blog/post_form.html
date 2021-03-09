@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}{% if post.title == "" %}
+    Create
+  {% else %}
+    Edit
+  {% endif %} Post{% endblock title %}
+
+{% block content %}
+  <form action="" method="post">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <button type="submit" class="btn btn-success">
+  {% if post.title == "" %}
+    Create
+  {% else %}
+    Edit
+  {% endif %}
+  </button>
+  </form>
+{% endblock content %}
