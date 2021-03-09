@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load crispy_forms_tags %}
 {% block title %}Post: {{ post.title }}{% endblock title %}
 
 {% block content %}
@@ -22,7 +22,12 @@
   </div>
   <div>
   {% if request.user.is_authenticated %}
-{#    {% include "blog/comment_form.html" %}#}
+    <h5>Add comment</h5>
+    <form action="" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button class="btn btn-success">Add</button>
+    </form>
   {% else %}
     In order to post a comment you must log in
   {% endif %}
@@ -37,8 +42,8 @@
         <p>{{ comment.content }}</p>
         {% if comment.author == request.user %}
           <div>
-            <a class="btn btn-primary" href="#">Edit</a>
-            <a class="btn btn-danger" href="#">Delete</a>
+            <a class="btn btn-primary" href="{% url "blog:comment-edit" comment.pk %}">Edit</a>
+            <a class="btn btn-danger" href="{% url "blog:comment-delete" comment.pk %}">Delete</a>
           </div>
         {% endif %}
         <div>
