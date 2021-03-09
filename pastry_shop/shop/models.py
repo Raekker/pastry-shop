@@ -9,7 +9,7 @@ from pastry_shop.users.models import User
 
 class Category(models.Model):
     name = models.CharField(_("Name"), max_length=100)
-    slug = AutoSlugField(populate_from=name)
+    slug = AutoSlugField(populate_from="name")
 
 
 class Product(models.Model):
