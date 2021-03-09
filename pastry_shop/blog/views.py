@@ -1,6 +1,7 @@
-from typing import Any, Dict
+from typing import Any, Dict, Type, Optional
 
 from django.db.models import QuerySet
+from django.forms.forms import BaseForm
 from django.forms.models import BaseModelForm
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
@@ -9,11 +10,11 @@ from django.shortcuts import render, redirect
 from django.urls.base import reverse_lazy, reverse
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
 from django.views.generic.list import ListView
 
-from pastry_shop.blog.forms import PostForm
-from pastry_shop.blog.models import Post
+from pastry_shop.blog.forms import PostForm, CommentForm
+from pastry_shop.blog.models import Post, Comment
 from pastry_shop.users.models import User
 
 
@@ -33,9 +34,33 @@ class PostListView(ListView):
         return Post.objects.order_by("-created")
 
 
-class PostDetailView(DetailView):
+class PostDetailView(FormMixin, DetailView):
     model = Post
     template_name = "blog/post_detail.html"
+    form_class = CommentForm
+
+    def get_success_url(self) -> str:
+        return reverse("blog:post-detail", kwargs={"pk": self.object.pk})
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super(PostDetailView, self).get_context_data(**kwargs)
+        context["form"] = CommentForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form: BaseForm) -> HttpResponse:
+        comment = form.save(commit=False)
+        comment.author = self.request.user
+        comment.post = self.object
+        comment.save()
+        return redirect(self.get_success_url())
 
 
 class PostCreateView(CreateView):
@@ -59,7 +84,7 @@ class PostEditView(UpdateView):
     form_class = PostForm
 
     def get_success_url(self) -> str:
-        return reverse("blog:post-detail", kwargs={"pk": self.kwargs.get("pk")})
+        return reverse("blog:post-detail", kwargs={"pk": self.object.pk})
 
 
 class PostDeleteView(DeleteView):
@@ -68,3 +93,20 @@ class PostDeleteView(DeleteView):
 
     def get_success_url(self) -> str:
         return reverse("blog:post-list")
+
+
+class CommentEditView(UpdateView):
+    model = Comment
+    template_name = "blog/comment_form.html"
+    form_class = CommentForm
+
+    def get_success_url(self) -> str:
+        return reverse("blog:post-detail", kwargs={"pk": self.object.post.pk})
+
+
+class CommentDeleteView(DeleteView):
+    model = Comment
+    template_name = "blog/comment_confirm_delete.html"
+
+    def get_success_url(self) -> str:
+        return reverse("blog:post-detail", kwargs={"pk": self.object.post.pk})
