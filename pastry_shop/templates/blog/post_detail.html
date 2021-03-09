@@ -8,8 +8,8 @@
     <h3>{{ post.title }}</h3>
     {% if request.user.is_staff %}
       <div>
-        <a class="btn btn-primary" href="#">Edit</a>
-        <a class="btn btn-danger" href="#">Delete</a>
+        <a class="btn btn-primary" href="{% url "blog:post-edit" post.pk %}">Edit</a>
+        <a class="btn btn-danger" href="{% url "blog:post-delete" post.pk %}">Delete</a>
       </div>
     {% endif %}
   </div>

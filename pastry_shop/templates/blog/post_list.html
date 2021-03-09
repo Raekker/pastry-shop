@@ -3,6 +3,11 @@
 {% block title %}Posts{% endblock title %}
 
 {% block content %}
+  {% if request.user.is_staff %}
+  <div>
+    <a class="btn btn-success" href="{% url "blog:post-create" %}">Add</a>
+  </div>
+  {% endif %}
 {% if posts %}
   <ul>
   {% for post in posts %}
@@ -11,8 +16,8 @@
       <h3><a href="{% url "blog:post-detail" post.pk %}">{{ post.title }}</a></h3>
       {% if request.user.is_staff %}
       <div>
-        <a class="btn btn-primary" href="#">Edit</a>
-        <a class="btn btn-danger" href="#">Delete</a>
+        <a class="btn btn-primary" href="{% url "blog:post-edit" post.pk %}">Edit</a>
+        <a class="btn btn-danger" href="{% url "blog:post-delete" post.pk %}">Delete</a>
       </div>
       {% endif %}
     </div>
