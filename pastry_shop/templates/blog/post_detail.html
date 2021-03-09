@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Post: {{ post.title }}{% endblock title %}
+
+{% block content %}
+  <div>
+  <div>
+    <h3>{{ post.title }}</h3>
+    {% if request.user.is_staff %}
+      <div>
+        <a class="btn btn-primary" href="#">Edit</a>
+        <a class="btn btn-danger" href="#">Delete</a>
+      </div>
+    {% endif %}
+  </div>
+  <div>
+    <p>{{ post.content }}</p>
+    <div>
+      <h5>Author: {{ post.author.username }}</h5>
+      <h6>{{ post.created }}</h6>
+    </div>
+  </div>
+  <div>
+  {% if request.user.is_authenticated %}
+{#    {% include "blog/comment_form.html" %}#}
+  {% else %}
+    In order to post a comment you must log in
+  {% endif %}
+  </div>
+  <div>
+    <h6>Comments</h6>
+    {% if post.comments.all %}
+      <ul>
+      {% for comment in post.comments.all %}
+      <li>
+      <div>
+        <p>{{ comment.content }}</p>
+        {% if comment.author == request.user %}
+          <div>
+            <a class="btn btn-primary" href="#">Edit</a>
+            <a class="btn btn-danger" href="#">Delete</a>
+          </div>
+        {% endif %}
+        <div>
+          <h5>{{ comment.author.username }}</h5>
+          <h6>{{ comment.created }}</h6>
+        </div>
+      </div>
+      </li>
+      {% endfor %}
+      </ul>
+      {% else %}
+      <p>No comments yet</p>
+    {% endif %}
+  </div>
+  </div>
+{% endblock content %}
