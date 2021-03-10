@@ -8,8 +8,8 @@
     <h2>{{ product.name }}</h2>
     {% if request.user.is_staff %}
       <div>
-        <a class="btn btn-primary" href="#">Edit</a>
-        <a class="btn btn-danger" href="#">Delete</a>
+        <a class="btn btn-primary" href="{% url "shop:product-edit" product.pk %}">Edit</a>
+        <a class="btn btn-danger" href="{% url "shop:product-delete" product.pk %}">Delete</a>
       </div>
     {% endif %}
   </div>

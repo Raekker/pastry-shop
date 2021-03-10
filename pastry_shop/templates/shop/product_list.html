@@ -5,7 +5,7 @@
 {% block content %}
   {% if request.user.is_staff %}
   <div>
-    <a class="btn btn-success" href="#">Add</a>
+    <a class="btn btn-success" href="{% url "shop:product-create" %}">Add</a>
   </div>
   {% endif %}
 {% if products %}
@@ -16,8 +16,8 @@
       <h3><a href="{% url "shop:product-detail" product.pk %}">{{ product.name }}</a></h3>
       {% if request.user.is_staff %}
       <div>
-        <a class="btn btn-primary" href="#">Edit</a>
-        <a class="btn btn-danger" href="#">Delete</a>
+        <a class="btn btn-primary" href="{% url "shop:product-edit" product.pk %}">Edit</a>
+        <a class="btn btn-danger" href="{% url "shop:product-delete" product.pk %}">Delete</a>
       </div>
       {% endif %}
     </div>
