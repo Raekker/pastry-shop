@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Product {{ product.name }}{% endblock title %}
+
+{% block content %}
+  <div>
+  <div>
+    <h2>{{ product.name }}</h2>
+    {% if request.user.is_staff %}
+      <div>
+        <a class="btn btn-primary" href="#">Edit</a>
+        <a class="btn btn-danger" href="#">Delete</a>
+      </div>
+    {% endif %}
+  </div>
+  <div>
+    <p>{{ product.description }}</p>
+    <div>
+      <p>Price: {{ product.price }}</p>
+      <p>In stock: {{ product.amount }}</p>
+    </div>
+    <div>
+    <p>Categories:</p>
+      <ul>
+      {% for category in product.categories.all %}
+        <li><a href="#">{{ category.name }}</a></li>
+      {% endfor %}
+      </ul>
+    </div>
+  </div>
+  </div>
+
+{% endblock content %}
