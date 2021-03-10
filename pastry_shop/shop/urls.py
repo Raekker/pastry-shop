@@ -6,6 +6,7 @@ from pastry_shop.shop.views import (
     ProductCreateView,
     ProductEditView,
     ProductDeleteView,
+    CategoryListView,
 )
 
 app_name = "shop"
@@ -18,4 +19,5 @@ urlpatterns = [
     path(
         "products/<int:pk>/delete/", ProductDeleteView.as_view(), name="product-delete"
     ),
+    path("categories/", CategoryListView.as_view(), name="category-list"),
 ]
