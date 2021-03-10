@@ -13,7 +13,7 @@
   {% for product in products %}
     <li>
     <div>
-      <h3><a href="#">{{ product.name }}</a></h3>
+      <h3><a href="{% url "shop:product-detail" product.pk %}">{{ product.name }}</a></h3>
       {% if request.user.is_staff %}
       <div>
         <a class="btn btn-primary" href="#">Edit</a>
@@ -29,7 +29,8 @@
       <h6>In stock: {{ product.amount }}</h6>
     </div>
     <div>
-      <ul>Categories:
+    <p>Categories:</p>
+      <ul>
         {% for category in product.categories.all %}
         <li><a href="#">{{ category.name }}</a></li>
         {% endfor %}
