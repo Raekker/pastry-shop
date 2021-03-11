@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Locations{% endblock title %}
+
+{% block content %}
+<div>
+<div>
+  <h3>Locations</h3>
+  <ul>
+    {% for shop in shops %}
+    <li>
+    <p><a href="#">{{ shop.name }}</a></p>
+    <p>City: {{ shop.city }}</p>
+    <p>Street: {{ shop.street }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% if request.user.is_staff %}
+<div>
+  <a class="btn btn-primary" href="#">Edit</a>
+  <a class="btn btn-danger" href="#">Delete</a>
+</div>
+{% endif %}
+</div>
+{% endblock content %}
