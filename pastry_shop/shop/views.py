@@ -59,3 +59,33 @@ class CategoryListView(ListView):
     model = Category
     template_name = "shop/category_list.html"
     context_object_name = "categories"
+
+
+class CategoryDetailView(DetailView):
+    model = Category
+    template_name = "shop/category_detail.html"
+
+
+class CategoryCreateView(CreateView):
+    model = Category
+    fields = ("name",)
+    template_name = "shop/category_form.html"
+    success_url = reverse_lazy("shop:category-list")
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super(CategoryEditView, self).get_context_data(**kwargs)
+        context["action"] = "create"
+        return context
+
+
+class CategoryEditView(UpdateView):
+    model = Category
+    fields = ("name",)
+    template_name = "shop/category_form.html"
+    success_url = reverse_lazy("shop:category-list")
+
+
+class CategoryDeleteView(DeleteView):
+    model = Category
+    template_name = "shop/category_confirm_delete.html"
+    success_url = reverse_lazy("shop:category-list")

@@ -23,7 +23,7 @@
     <p>Categories:</p>
       <ul>
       {% for category in product.categories.all %}
-        <li><a href="#">{{ category.name }}</a></li>
+        <li><a href="{% url "shop:category-detail" category.slug %}">{{ category.name }}</a></li>
       {% endfor %}
       </ul>
     </div>
