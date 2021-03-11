@@ -9,7 +9,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 
 from pastry_shop.shop.forms import ProductForm
-from pastry_shop.shop.models import Product, Category
+from pastry_shop.shop.models import Product, Category, Shop
 
 
 class ProductListView(ListView):
@@ -89,3 +89,9 @@ class CategoryDeleteView(DeleteView):
     model = Category
     template_name = "shop/category_confirm_delete.html"
     success_url = reverse_lazy("shop:category-list")
+
+
+class ShopListView(ListView):
+    model = Shop
+    template_name = "shop/shop_list.html"
+    context_object_name = "shops"

@@ -11,6 +11,7 @@ from pastry_shop.shop.views import (
     CategoryCreateView,
     CategoryEditView,
     CategoryDeleteView,
+    ShopListView,
 )
 
 app_name = "shop"
@@ -36,4 +37,5 @@ urlpatterns = [
         CategoryDeleteView.as_view(),
         name="category-delete",
     ),
+    path("shops/", ShopListView.as_view(), name="shop-list"),
 ]
