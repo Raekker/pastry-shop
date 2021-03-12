@@ -9,17 +9,24 @@
   <ul>
     {% for shop in shops %}
     <li>
-    <p><a href="#">{{ shop.name }}</a></p>
+    <div>
+    <h5><a href="{% url "shop:shop-detail" shop.pk %}">{{ shop.name }}</a></h5>
     <p>City: {{ shop.city }}</p>
     <p>Street: {{ shop.street }}</p>
+    </div>
+    {% if request.user.is_staff %}
+      <div>
+        <a class="btn btn-primary" href="{% url "shop:shop-edit" shop.pk %}">Edit</a>
+        <a class="btn btn-danger" href="{% url "shop:shop-delete" shop.pk %}">Delete</a>
+      </div>
+    {% endif %}
     </li>
     {% endfor %}
   </ul>
 </div>
 {% if request.user.is_staff %}
 <div>
-  <a class="btn btn-primary" href="#">Edit</a>
-  <a class="btn btn-danger" href="#">Delete</a>
+  <a class="btn btn-success" href="{% url "shop:shop-create" %}">Add shop</a>
 </div>
 {% endif %}
 </div>

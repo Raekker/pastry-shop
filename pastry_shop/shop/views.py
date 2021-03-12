@@ -95,3 +95,31 @@ class ShopListView(ListView):
     model = Shop
     template_name = "shop/shop_list.html"
     context_object_name = "shops"
+
+
+class ShopDetailView(DetailView):
+    model = Shop
+    template_name = "shop/shop_detail.html"
+
+
+class ShopCreateView(CreateView):
+    model = Shop
+    template_name = "shop/shop_form.html"
+    success_url = reverse_lazy("shop:shop-list")
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super(ShopCreateView, self).get_context_data(**kwargs)
+        context["action"] = "create"
+        return context
+
+
+class ShopEditView(UpdateView):
+    model = Shop
+    template_name = "shop/shop_form.html"
+    success_url = reverse_lazy("shop:shop-list")
+
+
+class ShopDeleteView(DeleteView):
+    model = Shop
+    template_name = "shop/shop_confirm_delete.html"
+    success_url = reverse_lazy("shop:shop-list")
