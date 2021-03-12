@@ -30,6 +30,9 @@ class ProductCart(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     amount = models.IntegerField()
 
+    def get_price(self):
+        return self.amount * self.product.price
+
 
 class Order(models.Model):
     class Status(models.IntegerChoices):

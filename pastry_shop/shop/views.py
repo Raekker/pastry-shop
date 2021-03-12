@@ -1,15 +1,17 @@
 from typing import Any, Dict
 
-from django.shortcuts import render
+from django.http.response import HttpResponse
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.urls.base import reverse_lazy
+from django.views.generic.base import View
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
 from django.views.generic.list import ListView
 
-from pastry_shop.shop.forms import ProductForm
-from pastry_shop.shop.models import Product, Category, Shop
+from pastry_shop.shop.forms import ProductForm, CartProductAddForm
+from pastry_shop.shop.models import Product, Category, Shop, Cart, ProductCart
 
 
 class ProductListView(ListView):
@@ -23,6 +25,26 @@ class ProductDetailView(DetailView):
     model = Product
     template_name = "shop/product_detail.html"
     context_object_name = "product"
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super(ProductDetailView, self).get_context_data(**kwargs)
+        context["form"] = CartProductAddForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = CartProductAddForm(request.POST)
+        if form.is_valid():
+            cart = Cart.objects.filter(client=self.request.user)
+            if not cart:
+                Cart.objects.create(client=self.request.user)
+            cart = Cart.objects.get(client=self.request.user)
+            product = ProductCart()
+            product.cart = cart
+            product.product = Product.objects.get(pk=kwargs.get("pk"))
+            product.amount = form.cleaned_data["amount"]
+            product.save()
+            return redirect("shop:cart-detail")
+        return render(request, "shop/product_detail.html", {"form": form})
 
 
 class ProductCreateView(CreateView):
@@ -73,7 +95,7 @@ class CategoryCreateView(CreateView):
     success_url = reverse_lazy("shop:category-list")
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        context = super(CategoryEditView, self).get_context_data(**kwargs)
+        context = super(CategoryCreateView, self).get_context_data(**kwargs)
         context["action"] = "create"
         return context
 
@@ -123,3 +145,48 @@ class ShopDeleteView(DeleteView):
     model = Shop
     template_name = "shop/shop_confirm_delete.html"
     success_url = reverse_lazy("shop:shop-list")
+
+
+class CartDetailView(View):
+    def get(self, request, *args, **kwargs):
+
+        cart = Cart.objects.filter(client=self.request.user).exists()
+
+        if cart:
+
+            total_price = 0
+            cart = Cart.objects.get(client=self.request.user)
+
+            if len(cart.products.all()) > 0:
+                total_price = self.get_total(self.request.user)
+
+            ctx = {"cart": cart, "total_price": total_price}
+
+            return render(request, "shop/cart_detail.html", ctx)
+
+        cart = Cart.objects.create(client=self.request.user)
+        ctx = {"cart": cart}
+        return render(request, "shop/cart_detail.html", ctx)
+
+    @staticmethod
+    def get_total(client):
+        total = 0
+        cart = Cart.objects.get(client=client)
+        for el in cart.productcart_set.all():
+            total += el.get_price()
+        return total
+
+
+class CartProductDeleteView(View):
+    def get(self, request, *args, **kwargs):
+        cart = Cart.objects.get(client=self.request.user)
+        product = cart.productcart_set.get(product_id=kwargs.get("pk"))
+        return render(
+            request, "shop/cart_product_confirm_delete.html", {"product": product}
+        )
+
+    def post(self, request, *args, **kwargs):
+        cart = Cart.objects.get(client=self.request.user)
+        product = cart.productcart_set.get(product_id=kwargs.get("pk"))
+        product.delete()
+        return redirect("shop:cart-detail")

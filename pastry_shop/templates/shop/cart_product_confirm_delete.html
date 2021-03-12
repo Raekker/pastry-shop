@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Remove from cart{% endblock title %}
+
+{% block content %}
+  <form action="" method="post">
+  {% csrf_token %}
+  <h4>Do you really want to delete this product {{ product.name }} from your cart ?</h4>
+  <button class="btn btn-danger">Delete</button>
+  </form>
+{% endblock content %}

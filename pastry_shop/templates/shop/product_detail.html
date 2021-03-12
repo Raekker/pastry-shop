@@ -14,11 +14,20 @@
     {% endif %}
   </div>
   <div>
+  <div>
     <p>{{ product.description }}</p>
     <div>
       <p>Price: {{ product.price }}</p>
       <p>In stock: {{ product.amount }}</p>
     </div>
+  </div>
+  <div>
+    <form action="" method="post">
+      {% csrf_token %}
+      <button class="btn btn-success">Add to cart</button>
+      {{ form.amount }}
+    </form>
+  </div>
     <div>
     <p>Categories:</p>
       <ul>
