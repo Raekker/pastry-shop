@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Cart{% endblock title %}
+
+{% block content %}
+<div>
+{% if cart.products.all %}
+<table>
+  <thead>
+  <tr>
+    <th>Product name</th>
+    <th>Amount</th>
+    <th>Price</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for el in cart.productcart_set.all %}
+  <tr>
+  <td>{{ el.product.name }}</td>
+  <td>{{ el.amount }}</td>
+  <td>{{ el.get_price }}</td>
+  <td><a href="{% url 'shop:cart-product-delete' el.product.pk %}">X</a></td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td></td>
+    <td>Total</td>
+    <td>{{ total_price }}</td>
+  </tr>
+  </tbody>
+</table>
+  {% else %}
+  <h4>No products in cart yet</h4>
+{% endif %}
+</div>
+{% endblock content %}
