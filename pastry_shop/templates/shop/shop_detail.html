@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Location details{% endblock title %}
+
+{% block content %}
+<div>
+<div>
+  <h3>{{ shop.name }}</h3>
+  <p>City: {{ shop.city }}</p>
+  <p>Street: {{ shop.street }}</p>
+</div>
+{% if request.user.is_staff %}
+<div>
+  <a class="btn btn-primary" href="{% url "shop:shop-edit" shop.pk %}">Edit</a>
+  <a class="btn btn-danger" href="{% url "shop:shop-delete" shop.pk %}">Delete</a>
+  <a class="btn btn-success" href="#">Add product</a>
+</div>
+{% endif %}
+<div>
+  {% if shop.products.all %}
+    Products:
+    <ul>
+    {% for el in shop.availability_set.all %}
+      <li>
+      <p>{{ el.product.name }}</p>
+      <p>In stock: {{ el.amount }}</p>
+      </li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+<div>
+  <p></p>
+</div>
+</div>
+{% endblock content %}
