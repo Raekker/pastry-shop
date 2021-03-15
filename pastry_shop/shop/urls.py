@@ -18,6 +18,8 @@ from pastry_shop.shop.views import (
     ShopDeleteView,
     CartDetailView,
     CartProductDeleteView,
+    OrderListView,
+    OrderDetailView,
 )
 
 app_name = "shop"
@@ -54,4 +56,6 @@ urlpatterns = [
         CartProductDeleteView.as_view(),
         name="cart-product-delete",
     ),
+    path("orders/", OrderListView.as_view(), name="order-list"),
+    path("orders/<int:pk>/", OrderDetailView.as_view(), name="order-detail"),
 ]

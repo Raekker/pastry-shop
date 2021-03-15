@@ -41,15 +41,25 @@ class Order(models.Model):
         PAID = 3, _("Paid")
         DELIVERED = 4, _("Delivered")
 
-    client = models.OneToOneField(User, on_delete=models.CASCADE)
+    client = models.ForeignKey(User, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, through="ProductOrder")
     status = models.IntegerField(choices=Status.choices, default=Status.PENDING)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def get_total(self):
+        total = 0
+        for product in self.productorder_set.all():
+            total += product.get_price()
+        return total
 
 
 class ProductOrder(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     amount = models.IntegerField()
+
+    def get_price(self):
+        return self.amount * self.product.price
 
 
 class Shop(models.Model):
