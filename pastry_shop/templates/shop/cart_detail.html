@@ -19,13 +19,13 @@
   <td>{{ el.product.name }}</td>
   <td>{{ el.amount }}</td>
   <td>{{ el.get_price }}</td>
-  <td><a href="{% url 'shop:cart-product-delete' el.product.pk %}">X</a></td>
+  <td><a class="btn btn-sm btn-danger" href="{% url 'shop:cart-product-delete' el.product.pk %}">Remove</a></td>
   </tr>
   {% endfor %}
   <tr>
     <td></td>
     <td>Total</td>
-    <td>{{ total_price }}</td>
+    <td>{{ cart.get_total }}</td>
   </tr>
   </tbody>
 </table>

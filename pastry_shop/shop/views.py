@@ -1,14 +1,13 @@
 from typing import Any, Dict
 
 from django.db.models import QuerySet
-from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.urls.base import reverse_lazy
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 
 from pastry_shop.shop.forms import ProductForm, CartProductAddForm, ShopProductAddForm
@@ -163,20 +162,11 @@ class CartDetailView(View):
         cart = Cart.objects.filter(client=self.request.user).exists()
 
         if cart:
-
-            total_price = 0
             cart = Cart.objects.get(client=self.request.user)
-
-            if len(cart.products.all()) > 0:
-                total_price = self.get_total(self.request.user)
-
-            ctx = {"cart": cart, "total_price": total_price}
-
-            return render(request, "shop/cart_detail.html", ctx)
+            return render(request, "shop/cart_detail.html", {"cart": cart})
 
         cart = Cart.objects.create(client=self.request.user)
-        ctx = {"cart": cart}
-        return render(request, "shop/cart_detail.html", ctx)
+        return render(request, "shop/cart_detail.html", {"cart": cart})
 
     def post(self, request, *args, **kwargs):
         cart = Cart.objects.get(client=self.request.user)
@@ -184,6 +174,7 @@ class CartDetailView(View):
         new_order.client = self.request.user
         new_order.status = 1
         new_order.save()
+
         for el in cart.productcart_set.all():
             new_product_order = ProductOrder()
             new_product_order.product = el.product
@@ -191,17 +182,11 @@ class CartDetailView(View):
             new_product_order.amount = el.amount
             new_product_order.save()
             new_order.productorder_set.add(new_product_order)
+
         new_order.save()
         cart.products.clear()
-        return redirect("shop:order-detail", pk=new_order.pk)
 
-    @staticmethod
-    def get_total(client):
-        total = 0
-        cart = Cart.objects.get(client=client)
-        for el in cart.productcart_set.all():
-            total += el.get_price()
-        return total
+        return redirect("shop:order-detail", pk=new_order.pk)
 
 
 class CartProductDeleteView(View):

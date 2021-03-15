@@ -9,7 +9,10 @@ from pastry_shop.users.models import User
 
 class Category(models.Model):
     name = models.CharField(_("Name"), max_length=100)
-    slug = AutoSlugField(populate_from="name")
+    slug = AutoSlugField(populate_from="name", unique=True, always_update=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Product(models.Model):
@@ -19,10 +22,22 @@ class Product(models.Model):
     amount = models.IntegerField(_("Amount"))
     categories = models.ManyToManyField(Category)
 
+    def __str__(self):
+        return self.name
+
 
 class Cart(models.Model):
     client = models.OneToOneField(User, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, through="ProductCart")
+
+    def get_total(self):
+        total = 0
+        for product in self.productcart_set.all():
+            total += product.get_price()
+        return total
+
+    def __str__(self):
+        return f"{self.client.username}'s cart({self.pk})"
 
 
 class ProductCart(models.Model):
@@ -46,6 +61,9 @@ class Order(models.Model):
     status = models.IntegerField(choices=Status.choices, default=Status.PENDING)
     created = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.client.username}'s order({self.pk})"
+
     def get_total(self):
         total = 0
         for product in self.productorder_set.all():
@@ -67,6 +85,9 @@ class Shop(models.Model):
     city = models.CharField(_("City"), max_length=100)
     street = models.CharField(_("Street"), max_length=100)
     products = models.ManyToManyField(Product, through="Availability")
+
+    def __str__(self):
+        return self.name
 
 
 class Availability(models.Model):
