@@ -11,7 +11,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
 from django.views.generic.list import ListView
 
-from pastry_shop.shop.forms import ProductForm, CartProductAddForm
+from pastry_shop.shop.forms import ProductForm, CartProductAddForm, ShopProductAddForm
 from pastry_shop.shop.models import (
     Product,
     Category,
@@ -20,6 +20,7 @@ from pastry_shop.shop.models import (
     ProductCart,
     Order,
     ProductOrder,
+    Availability,
 )
 
 
@@ -230,3 +231,38 @@ class OrderListView(ListView):
 class OrderDetailView(DetailView):
     model = Order
     template_name = "shop/order_detail.html"
+
+
+class ShopProductAddView(View):
+    def get(self, request, *args, **kwargs):
+        form = ShopProductAddForm()
+        return render(request, "shop/shop_product_add_form.html", {"form": form})
+
+    def post(self, request, *args, **kwargs):
+        form = ShopProductAddForm(request.POST)
+        shop = Shop.objects.get(pk=self.kwargs.get("pk"))
+        if form.is_valid():
+            available = Availability()
+            available.product = Product.objects.get(pk=form.cleaned_data["product"])
+            available.shop = shop
+            available.amount = form.cleaned_data["amount"]
+            available.save()
+            shop.availability_set.add(available)
+            shop.save()
+            return redirect("shop:shop-detail", pk=shop.pk)
+        return render(request, "shop/shop_product_add_form.html", {"form": form})
+
+
+class ShopProductDeleteView(View):
+    def get(self, request, *args, **kwargs):
+        shop = Shop.objects.get(pk=self.kwargs.get("pk"))
+        product = shop.availability_set.get(product_id=self.kwargs.get("product_id"))
+        return render(
+            request, "shop/shop_product_confirm_delete.html", {"product": product}
+        )
+
+    def post(self, request, *args, **kwargs):
+        shop = Shop.objects.get(pk=self.kwargs.get("pk"))
+        product = shop.availability_set.get(product_id=self.kwargs.get("product_id"))
+        product.delete()
+        return redirect("shop:shop-detail", pk=shop.pk)

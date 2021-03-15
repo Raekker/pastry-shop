@@ -13,7 +13,7 @@
 <div>
   <a class="btn btn-primary" href="{% url "shop:shop-edit" shop.pk %}">Edit</a>
   <a class="btn btn-danger" href="{% url "shop:shop-delete" shop.pk %}">Delete</a>
-  <a class="btn btn-success" href="#">Add product</a>
+  <a class="btn btn-success" href="{% url 'shop:shop-product-add' shop.pk %}">Add product</a>
 </div>
 {% endif %}
 <div>
@@ -22,7 +22,11 @@
     <ul>
     {% for el in shop.availability_set.all %}
       <li>
-      <p>{{ el.product.name }}</p>
+      <p>{{ el.product.name }}
+      {% if request.user.is_staff %}
+      <a class="btn btn-danger btn-sm" href="{% url 'shop:shop-product-remove' shop.pk el.product.pk %}">Remove</a>
+      {% endif %}
+      </p>
       <p>In stock: {{ el.amount }}</p>
       </li>
     {% endfor %}
