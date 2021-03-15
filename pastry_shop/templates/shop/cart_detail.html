@@ -29,6 +29,12 @@
   </tr>
   </tbody>
 </table>
+  <div>
+    <form action="" method="post">
+      {% csrf_token %}
+      <button class="btn btn-success">Order</button>
+    </form>
+  </div>
   {% else %}
   <h4>No products in cart yet</h4>
 {% endif %}

@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+from django.db.models import QuerySet
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 
@@ -11,7 +12,15 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMi
 from django.views.generic.list import ListView
 
 from pastry_shop.shop.forms import ProductForm, CartProductAddForm
-from pastry_shop.shop.models import Product, Category, Shop, Cart, ProductCart
+from pastry_shop.shop.models import (
+    Product,
+    Category,
+    Shop,
+    Cart,
+    ProductCart,
+    Order,
+    ProductOrder,
+)
 
 
 class ProductListView(ListView):
@@ -168,6 +177,23 @@ class CartDetailView(View):
         ctx = {"cart": cart}
         return render(request, "shop/cart_detail.html", ctx)
 
+    def post(self, request, *args, **kwargs):
+        cart = Cart.objects.get(client=self.request.user)
+        new_order = Order()
+        new_order.client = self.request.user
+        new_order.status = 1
+        new_order.save()
+        for el in cart.productcart_set.all():
+            new_product_order = ProductOrder()
+            new_product_order.product = el.product
+            new_product_order.order = new_order
+            new_product_order.amount = el.amount
+            new_product_order.save()
+            new_order.productorder_set.add(new_product_order)
+        new_order.save()
+        cart.products.clear()
+        return redirect("shop:order-detail", pk=new_order.pk)
+
     @staticmethod
     def get_total(client):
         total = 0
@@ -190,3 +216,17 @@ class CartProductDeleteView(View):
         product = cart.productcart_set.get(product_id=kwargs.get("pk"))
         product.delete()
         return redirect("shop:cart-detail")
+
+
+class OrderListView(ListView):
+    model = Order
+    template_name = "shop/order_list.html"
+    context_object_name = "orders"
+
+    def get_queryset(self) -> QuerySet:
+        return Order.objects.filter(client=self.request.user)
+
+
+class OrderDetailView(DetailView):
+    model = Order
+    template_name = "shop/order_detail.html"

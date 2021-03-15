@@ -87,6 +87,9 @@
           <ul class="navbar-nav mr-right">
             {% if request.user.is_authenticated %}
               <li class="nav-item">
+                <a class="nav-link" href="{% url 'shop:order-list' %}">{% trans "Orders" %}</a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="{% url "shop:cart-detail" %}">{% trans "Cart" %}</a>
               </li>
               <li class="nav-item">
