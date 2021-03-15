@@ -1,5 +1,6 @@
 from typing import Any, Dict, Type, Optional
 
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import QuerySet
 from django.forms.forms import BaseForm
 from django.forms.models import BaseModelForm
@@ -63,7 +64,8 @@ class PostDetailView(FormMixin, DetailView):
         return redirect(self.get_success_url())
 
 
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = "blog.add_post"
     model = Post
     template_name = "blog/post_form.html"
     form_class = PostForm
@@ -78,7 +80,8 @@ class PostCreateView(CreateView):
         return reverse("blog:post-list")
 
 
-class PostEditView(UpdateView):
+class PostEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "blog.change_post"
     model = Post
     template_name = "blog/post_form.html"
     form_class = PostForm
@@ -87,7 +90,8 @@ class PostEditView(UpdateView):
         return reverse("blog:post-detail", kwargs={"pk": self.object.pk})
 
 
-class PostDeleteView(DeleteView):
+class PostDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = "blog.delete_post"
     model = Post
     template_name = "blog/post_confirm_delete.html"
 
@@ -95,7 +99,7 @@ class PostDeleteView(DeleteView):
         return reverse("blog:post-list")
 
 
-class CommentEditView(UpdateView):
+class CommentEditView(LoginRequiredMixin, UpdateView):
     model = Comment
     template_name = "blog/comment_form.html"
     form_class = CommentForm
@@ -104,7 +108,7 @@ class CommentEditView(UpdateView):
         return reverse("blog:post-detail", kwargs={"pk": self.object.post.pk})
 
 
-class CommentDeleteView(DeleteView):
+class CommentDeleteView(LoginRequiredMixin, DeleteView):
     model = Comment
     template_name = "blog/comment_confirm_delete.html"
 
