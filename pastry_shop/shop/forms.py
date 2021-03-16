@@ -12,3 +12,8 @@ class ProductForm(forms.ModelForm):
 
 class CartProductAddForm(forms.Form):
     amount = forms.IntegerField(min_value=1)
+
+
+class ShopProductAddForm(forms.Form):
+    product = forms.ChoiceField(choices=Product.objects.values_list("pk", "name"))
+    amount = forms.IntegerField()

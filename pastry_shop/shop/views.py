@@ -1,17 +1,17 @@
 from typing import Any, Dict
 
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import QuerySet
-from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.urls.base import reverse_lazy
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 
-from pastry_shop.shop.forms import ProductForm, CartProductAddForm
+from pastry_shop.shop.forms import ProductForm, CartProductAddForm, ShopProductAddForm
 from pastry_shop.shop.models import (
     Product,
     Category,
@@ -20,6 +20,7 @@ from pastry_shop.shop.models import (
     ProductCart,
     Order,
     ProductOrder,
+    Availability,
 )
 
 
@@ -56,7 +57,8 @@ class ProductDetailView(DetailView):
         return render(request, "shop/product_detail.html", {"form": form})
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = "shop.add_product"
     model = Product
     template_name = "shop/product_form.html"
     form_class = ProductForm
@@ -68,7 +70,8 @@ class ProductCreateView(CreateView):
         return context
 
 
-class ProductEditView(UpdateView):
+class ProductEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "shop.change_product"
     model = Product
     template_name = "shop/product_form.html"
     form_class = ProductForm
@@ -80,7 +83,8 @@ class ProductEditView(UpdateView):
         return context
 
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = "shop.delete_product"
     model = Product
     template_name = "shop/product_confirm_delete.html"
     success_url = reverse_lazy("shop:product-list")
@@ -97,7 +101,8 @@ class CategoryDetailView(DetailView):
     template_name = "shop/category_detail.html"
 
 
-class CategoryCreateView(CreateView):
+class CategoryCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = "shop.add_category"
     model = Category
     fields = ("name",)
     template_name = "shop/category_form.html"
@@ -109,14 +114,16 @@ class CategoryCreateView(CreateView):
         return context
 
 
-class CategoryEditView(UpdateView):
+class CategoryEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "shop.change_category"
     model = Category
     fields = ("name",)
     template_name = "shop/category_form.html"
     success_url = reverse_lazy("shop:category-list")
 
 
-class CategoryDeleteView(DeleteView):
+class CategoryDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = "shop.delete_category"
     model = Category
     template_name = "shop/category_confirm_delete.html"
     success_url = reverse_lazy("shop:category-list")
@@ -133,8 +140,10 @@ class ShopDetailView(DetailView):
     template_name = "shop/shop_detail.html"
 
 
-class ShopCreateView(CreateView):
+class ShopCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = "shop.add_shop"
     model = Shop
+    fields = ("name", "city", "street")
     template_name = "shop/shop_form.html"
     success_url = reverse_lazy("shop:shop-list")
 
@@ -144,13 +153,16 @@ class ShopCreateView(CreateView):
         return context
 
 
-class ShopEditView(UpdateView):
+class ShopEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "shop.change_shop"
     model = Shop
+    fields = ("name", "city", "street")
     template_name = "shop/shop_form.html"
     success_url = reverse_lazy("shop:shop-list")
 
 
-class ShopDeleteView(DeleteView):
+class ShopDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = "shop.delete_shop"
     model = Shop
     template_name = "shop/shop_confirm_delete.html"
     success_url = reverse_lazy("shop:shop-list")
@@ -162,20 +174,11 @@ class CartDetailView(View):
         cart = Cart.objects.filter(client=self.request.user).exists()
 
         if cart:
-
-            total_price = 0
             cart = Cart.objects.get(client=self.request.user)
-
-            if len(cart.products.all()) > 0:
-                total_price = self.get_total(self.request.user)
-
-            ctx = {"cart": cart, "total_price": total_price}
-
-            return render(request, "shop/cart_detail.html", ctx)
+            return render(request, "shop/cart_detail.html", {"cart": cart})
 
         cart = Cart.objects.create(client=self.request.user)
-        ctx = {"cart": cart}
-        return render(request, "shop/cart_detail.html", ctx)
+        return render(request, "shop/cart_detail.html", {"cart": cart})
 
     def post(self, request, *args, **kwargs):
         cart = Cart.objects.get(client=self.request.user)
@@ -183,6 +186,7 @@ class CartDetailView(View):
         new_order.client = self.request.user
         new_order.status = 1
         new_order.save()
+
         for el in cart.productcart_set.all():
             new_product_order = ProductOrder()
             new_product_order.product = el.product
@@ -190,17 +194,11 @@ class CartDetailView(View):
             new_product_order.amount = el.amount
             new_product_order.save()
             new_order.productorder_set.add(new_product_order)
+
         new_order.save()
         cart.products.clear()
-        return redirect("shop:order-detail", pk=new_order.pk)
 
-    @staticmethod
-    def get_total(client):
-        total = 0
-        cart = Cart.objects.get(client=client)
-        for el in cart.productcart_set.all():
-            total += el.get_price()
-        return total
+        return redirect("shop:order-detail", pk=new_order.pk)
 
 
 class CartProductDeleteView(View):
@@ -230,3 +228,42 @@ class OrderListView(ListView):
 class OrderDetailView(DetailView):
     model = Order
     template_name = "shop/order_detail.html"
+
+
+class ShopProductAddView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "shop.add_availability"
+
+    def get(self, request, *args, **kwargs):
+        form = ShopProductAddForm()
+        return render(request, "shop/shop_product_add_form.html", {"form": form})
+
+    def post(self, request, *args, **kwargs):
+        form = ShopProductAddForm(request.POST)
+        shop = Shop.objects.get(pk=self.kwargs.get("pk"))
+        if form.is_valid():
+            available = Availability()
+            available.product = Product.objects.get(pk=form.cleaned_data["product"])
+            available.shop = shop
+            available.amount = form.cleaned_data["amount"]
+            available.save()
+            shop.availability_set.add(available)
+            shop.save()
+            return redirect("shop:shop-detail", pk=shop.pk)
+        return render(request, "shop/shop_product_add_form.html", {"form": form})
+
+
+class ShopProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "shop.delete_availability"
+
+    def get(self, request, *args, **kwargs):
+        shop = Shop.objects.get(pk=self.kwargs.get("pk"))
+        product = shop.availability_set.get(product_id=self.kwargs.get("product_id"))
+        return render(
+            request, "shop/shop_product_confirm_delete.html", {"product": product}
+        )
+
+    def post(self, request, *args, **kwargs):
+        shop = Shop.objects.get(pk=self.kwargs.get("pk"))
+        product = shop.availability_set.get(product_id=self.kwargs.get("product_id"))
+        product.delete()
+        return redirect("shop:shop-detail", pk=shop.pk)

@@ -20,6 +20,8 @@ from pastry_shop.shop.views import (
     CartProductDeleteView,
     OrderListView,
     OrderDetailView,
+    ShopProductAddView,
+    ShopProductDeleteView,
 )
 
 app_name = "shop"
@@ -50,6 +52,16 @@ urlpatterns = [
     path("shop/add/", ShopCreateView.as_view(), name="shop-create"),
     path("shop/<int:pk>/edit/", ShopEditView.as_view(), name="shop-edit"),
     path("shop/<int:pk>/delete/", ShopDeleteView.as_view(), name="shop-delete"),
+    path(
+        "shop/<int:pk>/product/add/",
+        ShopProductAddView.as_view(),
+        name="shop-product-add",
+    ),
+    path(
+        "shop/<int:pk>/product/<int:product_id>/",
+        ShopProductDeleteView.as_view(),
+        name="shop-product-remove",
+    ),
     path("cart/", CartDetailView.as_view(), name="cart-detail"),
     path(
         "cart/product/<int:pk>/delete/",
