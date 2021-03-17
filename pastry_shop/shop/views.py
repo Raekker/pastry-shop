@@ -48,11 +48,17 @@ class ProductDetailView(DetailView):
             if not cart:
                 Cart.objects.create(client=self.request.user)
             cart = Cart.objects.get(client=self.request.user)
-            product = ProductCart()
-            product.cart = cart
-            product.product = Product.objects.get(pk=kwargs.get("pk"))
-            product.amount = form.cleaned_data["amount"]
-            product.save()
+            product = Product.objects.get(pk=kwargs.get("pk"))
+            if cart.productcart_set.filter(product_id=product.pk).exists():
+                product_cart = cart.productcart_set.get(product_id=product.pk)
+                product_cart.amount += form.cleaned_data["amount"]
+                product_cart.save()
+            else:
+                product_cart = ProductCart()
+                product_cart.cart = cart
+                product_cart.product = product
+                product_cart.amount = form.cleaned_data["amount"]
+                product_cart.save()
             return redirect("shop:cart-detail")
         return render(request, "shop/product_detail.html", {"form": form})
 
@@ -193,7 +199,6 @@ class CartDetailView(View):
             new_product_order.order = new_order
             new_product_order.amount = el.amount
             new_product_order.save()
-            new_order.productorder_set.add(new_product_order)
 
         new_order.save()
         cart.products.clear()
@@ -241,12 +246,22 @@ class ShopProductAddView(LoginRequiredMixin, PermissionRequiredMixin, View):
         form = ShopProductAddForm(request.POST)
         shop = Shop.objects.get(pk=self.kwargs.get("pk"))
         if form.is_valid():
-            available = Availability()
-            available.product = Product.objects.get(pk=form.cleaned_data["product"])
-            available.shop = shop
-            available.amount = form.cleaned_data["amount"]
-            available.save()
-            shop.availability_set.add(available)
+
+            if shop.availability_set.filter(
+                product_id=form.cleaned_data["product"]
+            ).exists():
+                available = shop.availability_set.get(
+                    product_id=form.cleaned_data["product"]
+                )
+                available.amount += form.cleaned_data["amount"]
+                available.save()
+            else:
+                available = Availability()
+                available.product = Product.objects.get(pk=form.cleaned_data["product"])
+                available.shop = shop
+                available.amount = form.cleaned_data["amount"]
+                available.save()
+
             shop.save()
             return redirect("shop:shop-detail", pk=shop.pk)
         return render(request, "shop/shop_product_add_form.html", {"form": form})
