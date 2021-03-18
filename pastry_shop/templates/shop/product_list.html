@@ -3,42 +3,33 @@
 {% block title %}Products{% endblock title %}
 
 {% block content %}
+  <div class="row">
+  <div class="col-md-10"></div>
   {% if request.user.is_staff %}
-  <div>
-    <a class="btn btn-success" href="{% url "shop:product-create" %}">Add</a>
+  <div class="col-md-2 d-flex justify-content-end">
+    <a class="btn btn-outline-success mb-2" href="{% url "shop:product-create" %}">Add Product</a>
   </div>
   {% endif %}
+  </div>
+  <div>
 {% if products %}
-  <ul>
+  <ul style="list-style: none">
   {% for product in products %}
     <li>
-    <div>
-      <h3><a href="{% url "shop:product-detail" product.pk %}">{{ product.name }}</a></h3>
+    <div class="row mt-2 text-white">
+      <h3 class="col-md-6"><a href="{% url "shop:product-detail" product.pk %}">{{ product.name }}</a></h3>
+      <h5 class="col-md-4 mt-2">Price: {{ product.price }}</h5>
       {% if request.user.is_staff %}
-      <div>
-        <a class="btn btn-primary" href="{% url "shop:product-edit" product.pk %}">Edit</a>
-        <a class="btn btn-danger" href="{% url "shop:product-delete" product.pk %}">Delete</a>
+      <div class="col-md-2 d-flex justify-content-end align-items-center">
+        <a class="btn btn-outline-primary" href="{% url "shop:product-edit" product.pk %}">Edit</a>
+        <a class="btn btn-outline-danger ml-2" href="{% url "shop:product-delete" product.pk %}">Delete</a>
       </div>
       {% endif %}
-    </div>
-    <div>
-      <p>{{ product.description|truncatewords:50 }}</p>
-    </div>
-    <div>
-      <h5>Price: {{ product.price }}</h5>
-      <h6>In stock: {{ product.amount }}</h6>
-    </div>
-    <div>
-    <p>Categories:</p>
-      <ul>
-        {% for category in product.categories.all %}
-        <li><a href="#">{{ category.name }}</a></li>
-        {% endfor %}
-      </ul>
     </div>
     </li>
   {% endfor %}
   </ul>
+  </div>
 {% endif %}
   {% if is_paginated %}
   <ul class="pagination justify-content-center">

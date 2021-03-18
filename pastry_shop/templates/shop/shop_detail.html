@@ -3,38 +3,46 @@
 {% block title %}Location details{% endblock title %}
 
 {% block content %}
-<div>
-<div>
+<div class="text-white">
+<div class="row">
+<div class="col-md-8">
   <h3>{{ shop.name }}</h3>
-  <p>City: {{ shop.city }}</p>
-  <p>Street: {{ shop.street }}</p>
+  <p>
+    City: {{ shop.city }}<br>
+    Street: {{ shop.street }}
+  </p>
 </div>
 {% if request.user.is_staff %}
-<div>
-  <a class="btn btn-primary" href="{% url "shop:shop-edit" shop.pk %}">Edit</a>
-  <a class="btn btn-danger" href="{% url "shop:shop-delete" shop.pk %}">Delete</a>
-  <a class="btn btn-success" href="{% url 'shop:shop-product-add' shop.pk %}">Add product</a>
+<div class="col-md-4 d-flex justify-content-end align-items-center">
+  <a class="btn btn-outline-primary" href="{% url "shop:shop-edit" shop.pk %}">Edit</a>
+  <a class="btn btn-outline-danger ml-2" href="{% url "shop:shop-delete" shop.pk %}">Delete</a>
+  <a class="btn btn-outline-success ml-2" href="{% url 'shop:shop-product-add' shop.pk %}">Add product</a>
 </div>
 {% endif %}
-<div>
+</div>
+<div class="row">
+<div class="col-md-8">
   {% if shop.products.all %}
-    Products:
-    <ul>
+    <h4>Products:</h4>
+    <ul style="list-style: none">
     {% for el in shop.availability_set.all %}
-      <li>
-      <p>{{ el.product.name }}
-      {% if request.user.is_staff %}
-      <a class="btn btn-danger btn-sm" href="{% url 'shop:shop-product-remove' shop.pk el.product.pk %}">Remove</a>
-      {% endif %}
+      <li class="d-flex">
+      <p>
+        <a href="{% url 'shop:product-detail' el.product.pk %}">{{ el.product.name }}</a><br>
+      In stock: {{ el.amount }}
       </p>
-      <p>In stock: {{ el.amount }}</p>
+      {% if request.user.is_staff %}
+        <div class="d-flex justify-content-center align-items-start">
+          <a class="btn btn-outline-danger btn-sm ml-2"
+           href="{% url 'shop:shop-product-remove' shop.pk el.product.pk %}">Remove
+          </a>
+        </div>
+      {% endif %}
       </li>
     {% endfor %}
     </ul>
   {% endif %}
 </div>
-<div>
-  <p></p>
 </div>
 </div>
 {% endblock content %}
