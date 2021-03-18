@@ -149,14 +149,22 @@ class TestShop:
         shop = Shop.objects.first()
         product = Product.objects.first()
         products_before = shop.products.count()
+        amount_before = 0
+        if shop.availability_set.filter(product_id=product.pk).exists():
+            amount_before = shop.availability_set.get(product_id=product.pk).amount
+        amount = 4
         response = client.post(
             reverse("shop:shop-product-add", args=(shop.pk,)),
-            {"product": product.pk, "amount": 40},
+            {"product": product.pk, "amount": amount},
         )
         assert response.status_code == 302
-        assert products_before + 1 == shop.products.count()
-
-        # TODO fix test above
+        if shop.availability_set.filter(product_id=product.pk).exists():
+            assert (
+                shop.availability_set.get(product_id=product.pk).amount
+                == amount_before + amount
+            )
+        else:
+            assert products_before + 1 == shop.products.count()
 
     def test_shop_product_remove(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
@@ -179,14 +187,23 @@ class TestCart:
 
     def test_cart_add_product(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
-        product = Product.objects.first()
+        product = Product.objects.last()
         cart = Cart.objects.get(client=User.objects.get(username="testUser"))
         products_before = cart.productcart_set.count()
+        if cart.productcart_set.filter(product_id=product.pk).exists():
+            amount_before = cart.productcart_set.get(product_id=product.pk).amount
+        amount = 4
         response = client.post(
-            reverse("shop:product-detail", args=(product.pk,)), {"amount": 4}
+            reverse("shop:product-detail", args=(product.pk,)), {"amount": amount}
         )
         assert response.status_code == 302
-        assert products_before + 1 == cart.productcart_set.count()
+        if cart.productcart_set.filter(product_id=product.pk).exists():
+            assert (
+                cart.productcart_set.get(product_id=product.pk).amount
+                == amount_before + amount
+            )
+        else:
+            assert products_before + 1 == cart.productcart_set.count()
 
     def test_cart_remove_product(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))

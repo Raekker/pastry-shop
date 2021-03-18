@@ -15,5 +15,5 @@ class CartProductAddForm(forms.Form):
 
 
 class ShopProductAddForm(forms.Form):
-    product = forms.ChoiceField(choices=Product.objects.values_list("pk", "name"))
+    product = forms.ModelChoiceField(queryset=Product.objects.all())
     amount = forms.IntegerField()

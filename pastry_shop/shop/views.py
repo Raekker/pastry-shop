@@ -248,16 +248,18 @@ class ShopProductAddView(LoginRequiredMixin, PermissionRequiredMixin, View):
         if form.is_valid():
 
             if shop.availability_set.filter(
-                product_id=form.cleaned_data["product"]
+                product=form.cleaned_data["product"]
             ).exists():
                 available = shop.availability_set.get(
-                    product_id=form.cleaned_data["product"]
+                    product=form.cleaned_data["product"]
                 )
                 available.amount += form.cleaned_data["amount"]
                 available.save()
             else:
                 available = Availability()
-                available.product = Product.objects.get(pk=form.cleaned_data["product"])
+                available.product = Product.objects.get(
+                    pk=form.cleaned_data["product"].pk
+                )
                 available.shop = shop
                 available.amount = form.cleaned_data["amount"]
                 available.save()
