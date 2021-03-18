@@ -4,16 +4,18 @@
 Create
   {% else %}
   Edit
-{% endif %}Shop {% endblock title %}
+{% endif %} Shop{% endblock title %}
 
 {% block content %}
+  <div class="text-white">
   <form action="" method="post">
   {% csrf_token %}
   {{ form|crispy }}
   {% if action == "create" %}
-  <button class="btn btn-success">Create</button>
+  <button class="btn btn-outline-success">Create</button>
     {% else %}
-    <button class="btn btn-primary">Edit</button>
+    <button class="btn btn-outline-primary">Edit</button>
   {% endif %}
   </form>
+  </div>
 {% endblock content %}

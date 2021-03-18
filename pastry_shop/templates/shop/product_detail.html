@@ -3,39 +3,40 @@
 {% block title %}Product {{ product.name }}{% endblock title %}
 
 {% block content %}
-  <div>
-  <div>
-    <h2>{{ product.name }}</h2>
+  <div class="row text-white">
+    <div class="col-md-8">
+      <h2>{{ product.name }}</h2>
+      <p>{{ product.description }}</p>
+      <p>Price: {{ product.price }}</p>
+    </div>
     {% if request.user.is_staff %}
-      <div>
-        <a class="btn btn-primary" href="{% url "shop:product-edit" product.pk %}">Edit</a>
-        <a class="btn btn-danger" href="{% url "shop:product-delete" product.pk %}">Delete</a>
+      <div class="col-md-4 d-flex justify-content-end align-items-center">
+        <a class="btn btn-outline-primary" href="{% url "shop:product-edit" product.pk %}">Edit</a>
+        <a class="btn btn-outline-danger ml-2" href="{% url "shop:product-delete" product.pk %}">Delete</a>
       </div>
     {% endif %}
   </div>
-  <div>
-  <div>
-    <p>{{ product.description }}</p>
-    <div>
-      <p>Price: {{ product.price }}</p>
-      <p>In stock: {{ product.amount }}</p>
+  <div class="row">
+    <div class="col-md-4">
+      <form action="" method="post">
+        {% csrf_token %}
+        <button class="btn btn-outline-success">Add to cart</button>
+        {{ form.amount }}
+      </form>
     </div>
-  </div>
-  <div>
-    <form action="" method="post">
-      {% csrf_token %}
-      <button class="btn btn-success">Add to cart</button>
-      {{ form.amount }}
-    </form>
-  </div>
-    <div>
-    <p>Categories:</p>
-      <ul>
+    <div class="col-md-8 d-flex text-white">
+    <h3>Categories:</h3>
+      <ul style="list-style: none" class="d-flex justify-content-end">
       {% for category in product.categories.all %}
-        <li><a href="{% url "shop:category-detail" category.slug %}">{{ category.name }}</a></li>
+        <li class="mt-2"><a href="{% url "shop:category-detail" category.slug %}">{{ category.name }}</a>&nbsp;</li>
       {% endfor %}
       </ul>
     </div>
+  </div>
+  <div class="row">
+  <div class="col-md-8"></div>
+  <div class="col-md-4 d-flex justify-content-end">
+    <a class="btn btn-outline-info" href="{% url 'shop:category-list' %}">All categories</a>
   </div>
   </div>
 

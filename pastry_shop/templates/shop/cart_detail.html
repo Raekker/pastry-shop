@@ -3,36 +3,39 @@
 {% block title %}Cart{% endblock title %}
 
 {% block content %}
-<div>
+<div class="table-responsive">
 {% if cart.products.all %}
-<table>
-  <thead>
+<table class="table text-white">
+  <thead class="table-dark">
   <tr>
-    <th>Product name</th>
-    <th>Amount</th>
-    <th>Price</th>
+    <th scope="col">Product name</th>
+    <th scope="col">Amount</th>
+    <th scope="col">Price</th>
+    <th scope="col"></th>
   </tr>
   </thead>
   <tbody>
   {% for el in cart.productcart_set.all %}
   <tr>
-  <td>{{ el.product.name }}</td>
+  <td><a href="{% url 'shop:product-detail' el.product.pk %}">{{ el.product.name }}</a></td>
   <td>{{ el.amount }}</td>
   <td>{{ el.get_price }}</td>
-  <td><a class="btn btn-sm btn-danger" href="{% url 'shop:cart-product-delete' el.product.pk %}">Remove</a></td>
+  <td class="text-center">
+    <a class="btn btn-sm btn-outline-danger" href="{% url 'shop:cart-product-delete' el.product.pk %}">X</a></td>
   </tr>
   {% endfor %}
   <tr>
     <td></td>
-    <td>Total</td>
+    <td></td>
     <td>{{ cart.get_total }}</td>
+    <td class="text-center">Total</td>
   </tr>
   </tbody>
 </table>
   <div>
     <form action="" method="post">
       {% csrf_token %}
-      <button class="btn btn-success">Order</button>
+      <button class="btn btn-outline-success">Order</button>
     </form>
   </div>
   {% else %}

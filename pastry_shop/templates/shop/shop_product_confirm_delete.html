@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Remove product "{{ product.product.name }}" from this shop{% endblock title %}
+{% block title %}Remove {{ product.product.name }} from this shop {{ shop.name }} ?{% endblock title %}
 
 {% block content %}
-  <form action="" method="post">
-  {% csrf_token %}
-  <h3>Do you really want to remove this product "{{ product.product.name }}" from this shop ?</h3>
-  <button class="btn btn-danger">Remove</button>
-  </form>
+  <div class="row">
+    <div class="col-md-12 d-flex justify-content-center text-white align-items-center mt-5 pt-5">
+      <form action="" method="post" class="text-center">
+      {% csrf_token %}
+      <h3>Do you really want to remove this product "{{ product.product.name }}" from this shop ?</h3>
+      <button class="btn btn-outline-danger">Remove</button>
+      </form>
+    </div>
+  </div>
 {% endblock content %}
