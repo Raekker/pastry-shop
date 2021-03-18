@@ -3,10 +3,10 @@
 {% block title %}Order {{ order.pk }}{% endblock title %}
 
 {% block content %}
-<div>
+<div class="table-responsive text-white">
 {% if order.products.all %}
-<table>
-  <thead>
+<table class="table text-white">
+  <thead class="table-dark">
   <tr>
     <th>Product name</th>
     <th>Amount</th>
@@ -16,7 +16,7 @@
   <tbody>
   {% for el in order.productorder_set.all %}
   <tr>
-  <td>{{ el.product.name }}</td>
+  <td><a href="{% url 'shop:product-detail' el.product.pk %}">{{ el.product.name }}</a></td>
   <td>{{ el.amount }}</td>
   <td>{{ el.get_price }}</td>
   </tr>

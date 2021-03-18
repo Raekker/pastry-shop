@@ -51,10 +51,10 @@
 
   </head>
 
-  <body>
+  <body class="d-flex flex-column min-vh-100">
 
     <div class="mb-1">
-      <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -62,37 +62,31 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
-            {% if request.path == '/' %}
-            <li class="nav-item active">
-              <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
+            <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+              <a class="nav-link" href="{% url 'home' %}">{% trans "Home" %}</a>
             </li>
-            {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'home' %}">Home</a>
+            <li class="nav-item {% if 'about' in request.path %}active{% endif %}">
+              <a class="nav-link" href="{% url 'about' %}">{% trans "About" %}</a>
             </li>
-            {% endif %}
-            <li class="nav-item">
-              <a class="nav-link" href="#about">About</a>
+            <li class="nav-item {% if 'post' in request.path %}active{% endif %}">
+              <a class="nav-link" href="{% url 'blog:post-list' %}">{% trans "Posts" %}</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url "blog:post-list" %}">Posts</a>
+            <li class="nav-item {% if 'product' in request.path %}active{% endif %}">
+              <a class="nav-link" href="{% url 'shop:product-list' %}">{% trans "Products" %}</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url "shop:product-list" %}">Products</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url "shop:shop-list" %}">Locations</a>
+            <li class="nav-item {% if 'shop/shop' in request.path %}active{% endif %}">
+              <a class="nav-link" href="{% url 'shop:shop-list' %}">{% trans "Locations" %}</a>
             </li>
           </ul>
           <ul class="navbar-nav mr-right">
             {% if request.user.is_authenticated %}
-              <li class="nav-item">
+              <li class="nav-item {% if 'order' in request.path %}active{% endif %}">
                 <a class="nav-link" href="{% url 'shop:order-list' %}">{% trans "Orders" %}</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url "shop:cart-detail" %}">{% trans "Cart" %}</a>
+              <li class="nav-item {% if 'cart' in request.path %}active{% endif %}">
+                <a class="nav-link" href="{% url 'shop:cart-detail' %}">{% trans "Cart" %}</a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item {% if request.user.username  in request.path %}active{% endif %}">
                 {# URL provided by django-allauth/account/urls.py #}
                 <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
               </li>
@@ -115,8 +109,7 @@
       </nav>
 
     </div>
-
-    <div class="container">
+    <div class="container" style="padding-top: 7%; padding-bottom: 7%;">
 
       {% if messages %}
           {% for message in messages %}
@@ -128,19 +121,59 @@
         <p>Use this document as a way to quick start any new project.</p>
         <p>{{ request.path }}</p>
       {% endblock content %}
-    <footer class="text-center text-white fixed-bottom" style="background-color: #21081a;">
+    </div> <!-- /container -->
+    <footer class="text-center text-white mt-auto bg-dark">
       <!-- Grid container -->
-      <div class="container p-4"></div>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="container p-4">
+              <div class="p-4">
+                <h4>Reach us on</h4>
+                <ol class="list-unstyled">
+                  <li><a href="#">Instagram</a></li>
+                  <li><a href="#">Twitter</a></li>
+                  <li><a href="#">Facebook</a></li>
+                </ol>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="container p-4">
+              <div class="p-4">
+                <h4>Contact Info</h4>
+                <ol class="list-unstyled">
+                  <li>Phone: 123 456 789</li>
+                  <li>Email: pastry.shop@pastry.com</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="container p-4">
+              <div class="p-4">
+                <h4>Navigation</h4>
+                <ol class="list-unstyled">
+                  <li><a href="{% url 'home' %}">Home</a></li>
+                  <li><a href="{% url 'about' %}">About</a></li>
+                  <li><a href="{% url 'blog:post-list' %}">Posts</a></li>
+                  <li><a href="{% url 'shop:product-list' %}">Products</a></li>
+                  <li><a href="{% url 'shop:shop-list' %}">Locations</a></li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Grid container -->
 
       <!-- Copyright -->
-      <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+      <div class="text-center p-3" style="background-color: #191a1c;">
         © 2021 Maciej Purta:
-        <a class="text-white" href="#">Hello there</a>
+        <a class="text-white" href="https://www.github.com/raekker">Github</a>
       </div>
       <!-- Copyright -->
     </footer>
-    </div> <!-- /container -->
 
     {% block modal %}{% endblock modal %}
 

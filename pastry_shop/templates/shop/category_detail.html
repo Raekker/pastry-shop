@@ -3,21 +3,21 @@
 {% block title %}Category {{ category.name }} products{% endblock title %}
 
 {% block content %}
-<div>
-<div>
+<div class="text-white row">
+<div class="col-md-8">
 <h3>Products:</h3>
-<ul>
+<ul style="list-style: none">
   {% for product in category.product_set.all %}
     <li><a href="{% url "shop:product-detail" product.pk %}">{{ product.name }}</a></li>
   {% endfor %}
 </ul>
 </div>
-<div>
+<div class="col-md-4">
   {% if request.user.is_staff %}
-    <a class="btn btn-primary" href="{% url "shop:category-edit" category.slug %}">Edit</a>
-    <a class="btn btn-danger" href="{% url "shop:category-delete" category.slug %}">Delete</a>
+    <a class="btn btn-outline-primary" href="{% url "shop:category-edit" category.slug %}">Edit</a>
+    <a class="btn btn-outline-danger" href="{% url "shop:category-delete" category.slug %}">Delete</a>
   {% endif %}
-  <a class="btn btn-info" href="{% url "shop:category-list" %}">All categories</a>
+  <a class="btn btn-outline-info" href="{% url "shop:category-list" %}">All categories</a>
 </div>
 </div>
 {% endblock content %}

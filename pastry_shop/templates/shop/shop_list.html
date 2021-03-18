@@ -3,31 +3,36 @@
 {% block title %}Locations{% endblock title %}
 
 {% block content %}
+<div class="text-white">
+<div class="row">
+  <div class="col-md-8"></div>
+  {% if request.user.is_staff %}
+    <div class="col-md-4 d-flex justify-content-end align-items-center">
+      <a class="btn btn-outline-success" href="{% url "shop:shop-create" %}">Add shop</a>
+    </div>
+  {% endif %}
+</div>
 <div>
-<div>
-  <h3>Locations</h3>
-  <ul>
+  <h2>Locations</h2>
+  <ul style="list-style: none">
     {% for shop in shops %}
-    <li>
-    <div>
+    <li class="row">
+    <div class="col-md-8">
     <h5><a href="{% url "shop:shop-detail" shop.pk %}">{{ shop.name }}</a></h5>
-    <p>City: {{ shop.city }}</p>
-    <p>Street: {{ shop.street }}</p>
+    <p>
+      City: {{ shop.city }}<br>
+      Street: {{ shop.street }}
+    </p>
     </div>
     {% if request.user.is_staff %}
-      <div>
-        <a class="btn btn-primary" href="{% url "shop:shop-edit" shop.pk %}">Edit</a>
-        <a class="btn btn-danger" href="{% url "shop:shop-delete" shop.pk %}">Delete</a>
+      <div class="col-md-4 d-flex justify-content-end align-items-center">
+        <a class="btn btn-outline-primary" href="{% url "shop:shop-edit" shop.pk %}">Edit</a>
+        <a class="btn btn-outline-danger ml-2" href="{% url "shop:shop-delete" shop.pk %}">Delete</a>
       </div>
     {% endif %}
     </li>
     {% endfor %}
   </ul>
 </div>
-{% if request.user.is_staff %}
-<div>
-  <a class="btn btn-success" href="{% url "shop:shop-create" %}">Add shop</a>
-</div>
-{% endif %}
 </div>
 {% endblock content %}

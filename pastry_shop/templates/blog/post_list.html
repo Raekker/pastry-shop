@@ -3,40 +3,52 @@
 {% block title %}Posts{% endblock title %}
 
 {% block content %}
-  {% if request.user.is_staff %}
-  <div>
-    <a class="btn btn-success" href="{% url "blog:post-create" %}">Add</a>
-  </div>
-  {% endif %}
-{% if posts %}
-  <ul>
-  {% for post in posts %}
-    <li>
-    <div>
-      <h3><a href="{% url "blog:post-detail" post.pk %}">{{ post.title }}</a></h3>
+  <div class="row">
+    <div class="col-md-11">
+      {% if posts %}
+        {% for post in posts %}
+          <div class="text-white post border container-fluid mb-3">
+            <div class="post-header row p-2">
+              <h2 class="col-md-8 pt-2"><a href="{% url "blog:post-detail" post.pk %}">{{ post.title|title }}</a></h2>
+              {% if request.user.is_staff %}
+              <div class="d-flex justify-content-end col-md-4 align-items-center">
+                <a class="btn btn-outline-primary btn-sm m-1" href="{% url "blog:post-edit" post.pk %}">Edit</a>
+                <a class="btn btn-outline-danger btn-sm m-1" href="{% url "blog:post-delete" post.pk %}">Delete</a>
+              </div>
+              {% endif %}
+            </div>
+            <div class="post-body pt-2">
+              <p>{{ post.content|truncatewords:50 }}</p>
+            </div>
+            <div class="post-footer row">
+              <div class="post-info col-md-8 pt-2 pb-2">
+                <h5>Author:
+                  {% if post.author.name %}
+                    {{ post.author.name }}
+                  {% else %}
+                    {{ post.author.username }}
+                  {% endif %}
+                </h5>
+                <h6>{{ post.created }}</h6>
+              </div>
+              <div class="post-comments col-md-4 pt-4 justify-content-end d-flex">
+                <p>Comments: {{ post.comments.count }}</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="col-md-1">
       {% if request.user.is_staff %}
       <div>
-        <a class="btn btn-primary" href="{% url "blog:post-edit" post.pk %}">Edit</a>
-        <a class="btn btn-danger" href="{% url "blog:post-delete" post.pk %}">Delete</a>
+        <a class="btn btn-outline-success" href="{% url "blog:post-create" %}">Add Post</a>
       </div>
       {% endif %}
     </div>
-    <div>
-      <p>{{ post.content|truncatewords:50 }}</p>
-    </div>
-    <div>
-      <h5>Author: {{ post.author.username }}</h5>
-      <h6>{{ post.created }}</h6>
-    </div>
-    <div>
-      <p>Comments: {{ post.comments.count }}</p>
-    </div>
-    </li>
-  {% endfor %}
-  </ul>
-{% endif %}
+  </div>
   {% if is_paginated %}
-  <ul class="pagination justify-content-center">
+    <ul class="pagination justify-content-center">
   {% if page_obj.has_previous %}
     <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
   {% else %}
@@ -54,6 +66,6 @@
   {% else %}
     <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
   {% endif %}
-  </ul>
+    </ul>
   {% endif %}
 {% endblock content %}

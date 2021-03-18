@@ -3,25 +3,49 @@
 {% block content %}
 <section id="id_recent_posts">
   {% if recent_posts %}
-    {% for recent_post in recent_posts %}
-    <div>
-      <h3>{{ recent_post.title }}</h3>
-      <p>{{ recent_post.content|truncatewords:10 }}</p>
+    <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark">
+      <div class="col-md-6 px-0">
+        <h1 class="display-4">{{ recent_posts.0.title }}</h1>
+        <p class="lead my-3">{{ recent_posts.0.content|truncatewords:25 }}</p>
+        <p class="lead mb-0"><a href="{% url 'blog:post-detail' recent_posts.0.pk %}" class="text-white fw-bold">Continue reading...</a></p>
+      </div>
     </div>
-    <div>
-    {% if recent_post.comments.all %}
-      <p>Comments: {{ recent_post.comments.count }}</p>
-    {% else %}
-      <p>No comments yet</p>
-    {% endif %}
+    <div class="row mb-2">
+      <div class="col-md-6">
+        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+          <div class="col p-4 d-flex flex-column position-static text-white">
+            <h3 class="mb-0">{{ recent_posts.1.title }}</h3>
+            <div class="mb-1 text-muted">{{ recent_posts.1.created }}</div>
+            <p class="card-text mb-auto">{{ recent_posts.1.content|truncatewords:20 }}</p>
+            <a href="{% url 'blog:post-detail' recent_posts.1.pk %}" class="stretched-link">Continue reading</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+          <div class="col p-4 d-flex flex-column position-static text-white">
+            <h3 class="mb-0">{{ recent_posts.2.title }}</h3>
+            <div class="mb-1 text-muted">{{ recent_posts.2.created }}</div>
+            <p class="mb-auto">{{ recent_posts.2.content|truncatewords:20 }}</p>
+            <a href="{% url 'blog:post-detail' recent_posts.2.pk %}" class="stretched-link">Continue reading</a>
+          </div>
+        </div>
+      </div>
     </div>
-    {% endfor %}
   {% endif %}
 </section>
-<section id="about">
-<div>
-  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet dolor, esse facere illo in molestiae,
-    nisi nobis optio repudiandae ut vel voluptatem! Doloremque illum ipsa ipsam molestiae non sint, vel.</p>
-</div>
+<section>
+<div class="row">
+    <div class="col-md-12">
+      <div class="p-4 mb-3 bg-dark rounded text-white">
+        <h4>About Company</h4>
+        <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo facilis impedit laudantium
+          maxime minima necessitatibus, quaerat sequi veniam vero voluptatem? Adipisci exercitationem laudantium
+          magnam rem tempore! Assumenda hic illum molestiae.lorem Lorem ipsum dolor sit amet, consectetur adipisicing
+          elit. A, animi, aut blanditiis commodi earum enim id molestiae numquam, porro quae quibusdam ratione.
+          Aut ducimus eius error, modi nesciunt quae sapiente?</p>
+      </div>
+    </div>
+  </div>
 </section>
 {% endblock content %}
