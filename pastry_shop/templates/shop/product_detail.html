@@ -17,6 +17,16 @@
     {% endif %}
   </div>
   <div class="row">
+      <div class="col-md-12 d-flex text-white">
+      <h4>Available in</h4>
+      <ul style="list-style: none" class="d-flex justify-content-end">
+      {% for shop in product.shop_set.all %}
+        <li class="mt-1"><a href="{% url "shop:shop-detail" shop.pk %}">{{ shop }}</a>&nbsp;</li>
+      {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="row">
     <div class="col-md-4">
       <form action="" method="post">
         {% csrf_token %}
@@ -24,20 +34,17 @@
         {{ form.amount }}
       </form>
     </div>
-    <div class="col-md-8 d-flex text-white">
-    <h3>Categories:</h3>
+    <div class="col-md-6 d-flex text-white">
+    <h4 class="mt-1">Categories:</h4>
       <ul style="list-style: none" class="d-flex justify-content-end">
       {% for category in product.categories.all %}
         <li class="mt-2"><a href="{% url "shop:category-detail" category.slug %}">{{ category.name }}</a>&nbsp;</li>
       {% endfor %}
       </ul>
     </div>
-  </div>
-  <div class="row">
-  <div class="col-md-8"></div>
-  <div class="col-md-4 d-flex justify-content-end">
-    <a class="btn btn-outline-info" href="{% url 'shop:category-list' %}">All categories</a>
-  </div>
+    <div class="col-md-2 d-flex justify-content-end align-items-center">
+      <a class="btn btn-outline-info mb-2" href="{% url 'shop:category-list' %}">All categories</a>
+    </div>
   </div>
 
 {% endblock content %}
