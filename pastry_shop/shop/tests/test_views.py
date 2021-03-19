@@ -209,20 +209,26 @@ class TestShop:
         client.force_login(user=User.objects.get(username="testUser"))
         shop = Shop.objects.first()
         product = Product.objects.first()
-        amount_before = shop.availability_set.get(product_id=product.pk).amount
+        products_before = shop.products.count()
+        amount_before = 0
+        if shop.availability_set.filter(product_id=product.pk).exists():
+            amount_before = shop.availability_set.get(product_id=product.pk).amount
         amount = 4
         response = client.post(
             reverse("shop:shop-product-add", args=(shop.pk,)),
             {"product": product.pk, "amount": amount},
         )
         assert response.status_code == 302
-        assert (
-            shop.availability_set.get(product_id=product.pk).amount
-            == amount_before + amount
-        )
-        assert Availability.objects.filter(
-            shop=shop, product=product, amount=amount_before + amount
-        ).exists()
+        if shop.availability_set.filter(product_id=product.pk).exists():
+            assert (
+                shop.availability_set.get(product_id=product.pk).amount
+                == amount_before + amount
+            )
+        else:
+            assert products_before + 1 == shop.products.count()
+            assert Availability.objects.filter(
+                shop=shop, product=product, amount=amount
+            ).exists()
 
     def test_shop_product_add_different(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
