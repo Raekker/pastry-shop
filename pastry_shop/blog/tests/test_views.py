@@ -84,6 +84,15 @@ class TestComment:
         assert response.status_code == 302
         assert comments_before + 1 == post.comments.count()
 
+    def test_comment_post_wrong_data(self, client, set_up):
+        client.force_login(user=User.objects.get(username="testUser"))
+        post = Post.objects.first()
+        response = client.post(
+            reverse("blog:post-detail", args=(post.pk,)), {"content": ""}
+        )
+        assert response.status_code == 200
+        assert "form" in response.context
+
     def test_comment_edit(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
         post = Post.objects.first()

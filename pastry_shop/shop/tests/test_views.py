@@ -3,7 +3,16 @@ from django.urls.base import reverse
 
 from faker import Faker
 
-from pastry_shop.shop.models import Product, Category, Shop, Cart, Order
+from pastry_shop.shop.forms import ShopProductAddForm
+from pastry_shop.shop.models import (
+    Product,
+    Category,
+    Shop,
+    Cart,
+    Order,
+    ProductCart,
+    Availability,
+)
 from pastry_shop.users.models import User
 
 pytestmark = pytest.mark.django_db
@@ -24,6 +33,29 @@ class TestProduct:
         for attr in ("name", "description", "price", "amount"):
             assert hasattr(response.context["product"], attr)
 
+    def test_cart_creation(self, client, set_up):
+        new_client = User.objects.create_user(
+            username="newTestClient", password="testpassword"
+        )
+        client.force_login(user=new_client)
+        product = Product.objects.first()
+        amount = 4
+        response = client.post(
+            reverse("shop:product-detail", args=(product.pk,)), {"amount": amount}
+        )
+        cart = Cart.objects.get(client=new_client)
+        assert response.status_code == 302
+        assert cart
+        assert ProductCart.objects.filter(
+            cart=cart, product=product, amount=amount
+        ).exists()
+        amount = ""
+        response = client.post(
+            reverse("shop:product-detail", args=(product.pk,)), {"amount": amount}
+        )
+        assert response.status_code == 200
+        assert "form" in response.context
+
     def test_product_create(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
         products_before = Product.objects.count()
@@ -40,6 +72,13 @@ class TestProduct:
         assert response.status_code == 302
         assert products_before + 1 == Product.objects.count()
 
+    def test_product_create_context_data(self, client, set_up):
+        client.force_login(user=User.objects.get(username="testUser"))
+        response = client.get(reverse("shop:product-create"))
+        assert response.status_code == 200
+        for key in ("action", "form"):
+            assert key in response.context
+
     def test_product_edit(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
         product = Product.objects.first()
@@ -54,6 +93,14 @@ class TestProduct:
         product = Product.objects.get(pk=product.pk)
         assert response.status_code == 302
         assert product.name == "newName"
+
+    def test_product_edit_context_data(self, client, set_up):
+        client.force_login(user=User.objects.get(username="testUser"))
+        product = Product.objects.first()
+        response = client.get(reverse("shop:product-edit", args=(product.pk,)))
+        assert response.status_code == 200
+        for key in ("action", "form"):
+            assert key in response.context
 
     def test_product_delete(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
@@ -82,6 +129,13 @@ class TestCategory:
         response = client.post(reverse("shop:category-create"), {"name": fake.word()})
         assert response.status_code == 302
         assert categories_before + 1 == Category.objects.count()
+
+    def test_category_create_context_data(self, client, set_up):
+        client.force_login(user=User.objects.get(username="testUser"))
+        response = client.get(reverse("shop:category-create"))
+        assert response.status_code == 200
+        for key in ("action", "form"):
+            assert key in response.context
 
     def test_category_edit(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
@@ -125,6 +179,13 @@ class TestShop:
         assert response.status_code == 302
         assert shops_before + 1 == Shop.objects.count()
 
+    def test_shop_create_context_data(self, client, set_up):
+        client.force_login(user=User.objects.get(username="testUser"))
+        response = client.get(reverse("shop:shop-create"))
+        assert response.status_code == 200
+        for key in ("action", "form"):
+            assert key in response.context
+
     def test_shop_edit(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
         shop = Shop.objects.first()
@@ -144,7 +205,7 @@ class TestShop:
         assert response.status_code == 302
         assert shops_before - 1 == Shop.objects.count()
 
-    def test_shop_product_add(self, client, set_up):
+    def test_shop_product_add_same(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
         shop = Shop.objects.first()
         product = Product.objects.first()
@@ -165,6 +226,42 @@ class TestShop:
             )
         else:
             assert products_before + 1 == shop.products.count()
+            assert Availability.objects.filter(
+                shop=shop, product=product, amount=amount
+            ).exists()
+
+    def test_shop_product_add_different(self, client, set_up):
+        client.force_login(user=User.objects.get(username="testUser"))
+        shop = Shop.objects.first()
+        product = Product.objects.last()
+        products_before = shop.products.count()
+        amount = 4
+        response = client.post(
+            reverse("shop:shop-product-add", args=(shop.pk,)),
+            {"product": product.pk, "amount": amount},
+        )
+        assert response.status_code == 302
+        assert products_before + 1 == shop.products.count()
+        assert Availability.objects.filter(
+            shop=shop, product=product, amount=amount
+        ).exists()
+
+    def test_shop_product_add_wrong_data(self, client, set_up):
+        client.force_login(user=User.objects.get(username="testUser"))
+        shop = Shop.objects.first()
+        response = client.post(
+            reverse("shop:shop-product-add", args=(shop.pk,)), {"amount": ""}
+        )
+        assert response.status_code == 200
+        assert "form" in response.context
+
+    def test_shop_product_add_get(self, client, set_up):
+        client.force_login(user=User.objects.get(username="testUser"))
+        shop = Shop.objects.first()
+        response = client.get(reverse("shop:shop-product-add", args=(shop.pk,)))
+        assert response.status_code == 200
+        assert "form" in response.context
+        assert isinstance(response.context["form"], ShopProductAddForm)
 
     def test_shop_product_remove(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
@@ -177,6 +274,16 @@ class TestShop:
         assert response.status_code == 302
         assert products_before - 1 == shop.products.count()
 
+    def test_shop_product_remove_get(self, client, set_up):
+        client.force_login(user=User.objects.get(username="testUser"))
+        shop = Shop.objects.first()
+        product = shop.products.first()
+        response = client.get(
+            reverse("shop:shop-product-remove", args=(shop.pk, product.pk))
+        )
+        assert response.status_code == 200
+        assert "product" in response.context
+
 
 class TestCart:
     def test_cart_detail(self, client, set_up):
@@ -184,6 +291,15 @@ class TestCart:
         response = client.get(reverse("shop:cart-detail"))
         assert response.status_code == 200
         assert len(response.context["cart"].productcart_set.all()) == 3
+
+    def test_cart_creation(self, client, set_up):
+        new_client = User.objects.create_user(
+            username="newTestClient", password="testpassword"
+        )
+        client.force_login(user=new_client)
+        response = client.get(reverse("shop:cart-detail"))
+        assert response.status_code == 200
+        assert isinstance(response.context["cart"], Cart)
 
     def test_cart_add_product(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
@@ -213,6 +329,15 @@ class TestCart:
         response = client.post(reverse("shop:cart-product-delete", args=(product.pk,)))
         assert response.status_code == 302
         assert products_before - 1 == cart.productcart_set.count()
+
+    def test_cart_remove_get(self, client, set_up):
+        client.force_login(user=User.objects.get(username="testUser"))
+        product = Product.objects.first()
+        cart = Cart.objects.get(client=User.objects.get(username="testUser"))
+        response = client.get(reverse("shop:cart-product-delete", args=(product.pk,)))
+        assert response.status_code == 200
+        assert "product" in response.context
+        assert cart
 
 
 class TestOrder:
