@@ -13,6 +13,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = "Categories"
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
@@ -24,6 +25,9 @@ class Product(models.Model):
     price = models.DecimalField(_("Price"), max_digits=7, decimal_places=2)
     amount = models.IntegerField(_("Amount"))
     categories = models.ManyToManyField(Category)
+
+    class Meta:
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
@@ -88,6 +92,9 @@ class Shop(models.Model):
     city = models.CharField(_("City"), max_length=100)
     street = models.CharField(_("Street"), max_length=100)
     products = models.ManyToManyField(Product, through="Availability")
+
+    class Meta:
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
