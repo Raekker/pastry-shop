@@ -205,7 +205,7 @@ class TestShop:
         assert response.status_code == 302
         assert shops_before - 1 == Shop.objects.count()
 
-    def test_shop_product_add_same(self, client, set_up):
+    def test_shop_product_add(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
         shop = Shop.objects.first()
         product = Product.objects.first()
@@ -233,7 +233,7 @@ class TestShop:
     def test_shop_product_add_different(self, client, set_up):
         client.force_login(user=User.objects.get(username="testUser"))
         shop = Shop.objects.first()
-        product = Product.objects.last()
+        product = Product.objects.exclude(shop=shop)[0]
         products_before = shop.products.count()
         amount = 4
         response = client.post(
