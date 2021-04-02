@@ -2,6 +2,12 @@ Pastry Shop
 ===========
 
 Pastry shop website to sell their goods and make blog posts about them.
+Deployed to: https://nameless-thicket-17547.herokuapp.com/
+
+In order to test application use these accounts:
+
+* testStaff - testpassword
+* testUser - testpassword
 
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter
      :target: https://github.com/pydanny/cookiecutter-django/
