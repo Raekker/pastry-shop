@@ -2,7 +2,7 @@
 
 {% block content %}
 <section id="id_recent_posts">
-  {% if recent_posts %}
+  {% if recent_posts.count == 3 %}
     <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark">
       <div class="col-md-6 px-0">
         <h1 class="display-4">{{ recent_posts.0.title }}</h1>
@@ -32,6 +32,30 @@
         </div>
       </div>
     </div>
+  {% elif recent_posts.count == 2 %}
+        <div class="row mb-2">
+      <div class="col-md-6">
+        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+          <div class="col p-4 d-flex flex-column position-static text-white">
+            <h3 class="mb-0">{{ recent_posts.0.title }}</h3>
+            <div class="mb-1 text-muted">{{ recent_posts.0.created }}</div>
+            <p class="card-text mb-auto">{{ recent_posts.0.content|truncatewords:20 }}</p>
+            <a href="{% url 'blog:post-detail' recent_posts.0.pk %}" class="stretched-link">Continue reading</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+          <div class="col p-4 d-flex flex-column position-static text-white">
+            <h3 class="mb-0">{{ recent_posts.1.title }}</h3>
+            <div class="mb-1 text-muted">{{ recent_posts.1.created }}</div>
+            <p class="mb-auto">{{ recent_posts.1.content|truncatewords:20 }}</p>
+            <a href="{% url 'blog:post-detail' recent_posts.1.pk %}" class="stretched-link">Continue reading</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% elif recent_posts.count == 1 %}
   {% endif %}
 </section>
 <section>
